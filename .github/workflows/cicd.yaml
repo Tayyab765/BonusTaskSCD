@@ -1,0 +1,42 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and push blog-service
+      run: |
+        cd blog-service
+        docker build -t 22i2554/blog-service:latest .
+        docker push 22i2554/blog-service:latest
+    - name: Build and push auth-service
+      run: |
+        cd auth-service
+        docker build -t 22i2554/auth-service:latest .
+        docker push 22i2554/auth-service:latest
+    - name: Build and push apache
+      run: |
+        cd apache
+        docker build -t 22i2554/apache-reverse-proxy:latest .
+        docker push 22i2554/apache-reverse-proxy:latest
+    - name: Deploy to Kubernetes
+      uses: azure/k8s-deploy@v4
+      with:
+        namespace: default
+        manifests: |
+          k8s/configmap.yaml
+          k8s/secret.yaml
+          k8s/blog-deployment.yaml
+          k8s/auth-deployment.yaml
+          k8s/apache-deployment.yaml
+        kubeconfig: ${{ secrets.KUBECONFIG }}
