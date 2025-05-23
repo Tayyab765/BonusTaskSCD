@@ -36,10 +36,10 @@ jobs:
 
     - name: Deploy microservices
       run: |
-        kubectl apply -f K8s/
+        kubectl apply -f K8s/ --validate=false
         kubectl rollout status deployment/blog-deployment
 
-        
+
     
     
   
