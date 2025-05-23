@@ -29,14 +29,15 @@ jobs:
         cd apache
         docker build -t 22i2554/apache-reverse-proxy:latest .
         docker push 22i2554/apache-reverse-proxy:latest
-    - name: Deploy to Kubernetes
-      uses: azure/k8s-set-context@v1  
-      with:
-        namespace: default
-        manifests: |
-          k8s/configmap.yaml
-          k8s/secret.yaml
-          k8s/blog-deployment.yaml
-          k8s/auth-deployment.yaml
-          k8s/apache-deployment.yaml
-        kubeconfig: ${{ secrets.KUBECONFIG }}
+    - name: Set up Kubeconfig
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+
+    - name: Deploy microservices
+      run: |
+        kubectl apply -f k8s/
+        kubectl rollout status deployment/blog-deployment
+    
+    
+  
