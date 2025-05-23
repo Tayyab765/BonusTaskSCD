@@ -38,6 +38,8 @@ jobs:
       run: |
         kubectl apply -f K8s/
         kubectl rollout status deployment/blog-deployment
+
+        
     
     
   
