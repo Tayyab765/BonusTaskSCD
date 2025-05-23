@@ -40,6 +40,8 @@ jobs:
         kubectl rollout status deployment/blog-deployment
 
 
+
+
     
     
   
